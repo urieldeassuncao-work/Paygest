@@ -1,26 +1,28 @@
+
 import { useState } from "react";
 import { X } from "lucide-react";
 
+function PaymentsModal({ onClose, onSave, initialData }) {
 
-function PaymentsModal({ onClose, onSave }) {
+  const isEditing = Boolean(initialData);
 
-  const [form, setForm] = useState({
-    payer: "",
-    beneficiary: "",
-    amount: "",
-    bank: "",
-    channel: "",
-    date: "",
-    reference: ""
-  });
+  const [form, setForm] = useState(() => ({
+    reference: initialData?.reference || "",
+    payer: initialData?.payer || "",
+    beneficiary: initialData?.beneficiary || "",
+    amount: initialData?.amount || "",
+    bank: initialData?.bank || "",
+    channel: initialData?.channel || "",
+    date: initialData?.date || ""
+  }));
 
   function handleChange(e) {
     const { name, value } = e.target;
 
-    setForm({
-      ...form,
+    setForm((previous) => ({
+      ...previous,
       [name]: value
-    });
+    }));
   }
 
   function handleSubmit(e) {
@@ -31,15 +33,16 @@ function PaymentsModal({ onClose, onSave }) {
       return;
     }
 
-    const newPayment = {
-      id: Date.now(),
+    const payment = {
+      ...initialData,
       ...form,
+      id: initialData?.id || Date.now(),
       amount: Number(form.amount),
-      currency: "AOA",
-      status: "Pendente"
+      currency: initialData?.currency || "AOA",
+      status: initialData?.status || "Pendente"
     };
 
-    onSave(newPayment);
+    onSave(payment);
   }
 
   return (
@@ -48,11 +51,23 @@ function PaymentsModal({ onClose, onSave }) {
       <div className="modal">
 
         <div className="modal-header">
-          <h2>Novo Pagamento</h2>
 
-          <button onClick={onClose}>
+          <div>
+            <h2>
+              {isEditing ? "Editar Pagamento" : "Novo Pagamento"}
+            </h2>
+
+            <p>
+              {isEditing
+                ? "Atualize os dados do pagamento."
+                : "Preencha os dados do pagamento."}
+            </p>
+          </div>
+
+          <button type="button" onClick={onClose}>
             <X />
           </button>
+
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -62,7 +77,6 @@ function PaymentsModal({ onClose, onSave }) {
             name="reference"
             value={form.reference}
             onChange={handleChange}
-            placeholder="Ex: PGT-2026-0001"
             required
           />
 
@@ -71,7 +85,6 @@ function PaymentsModal({ onClose, onSave }) {
             name="payer"
             value={form.payer}
             onChange={handleChange}
-            placeholder="Nome do pagador"
             required
           />
 
@@ -80,7 +93,6 @@ function PaymentsModal({ onClose, onSave }) {
             name="beneficiary"
             value={form.beneficiary}
             onChange={handleChange}
-            placeholder="Nome do beneficiário"
             required
           />
 
@@ -88,12 +100,14 @@ function PaymentsModal({ onClose, onSave }) {
           <input
             type="number"
             name="amount"
+            min="0.01"
+            step="0.01"
             value={form.amount}
             onChange={handleChange}
             required
           />
 
-          <label>Banco do pagador</label>
+          <label>Banco</label>
           <select
             name="bank"
             value={form.bank}
@@ -105,6 +119,8 @@ function PaymentsModal({ onClose, onSave }) {
             <option value="BFA">BFA</option>
             <option value="BIC">BIC</option>
             <option value="BCA">BCA</option>
+            <option value="BCI">BCI</option>
+            <option value="BNA">BNA</option>
           </select>
 
           <label>Canal de pagamento</label>
@@ -123,14 +139,16 @@ function PaymentsModal({ onClose, onSave }) {
 
           <label>Data do pagamento</label>
           <input
-            type="datetime-local"
+            type="text"
             name="date"
+            placeholder="Ex: 16/11/2026 14:30"
             value={form.date}
             onChange={handleChange}
             required
           />
 
           <div className="modal-actions">
+
             <button
               type="button"
               className="cancel-button"
@@ -140,8 +158,9 @@ function PaymentsModal({ onClose, onSave }) {
             </button>
 
             <button type="submit" className="primary-button">
-              Registar Pagamento
+              {isEditing ? "Guardar alterações" : "Registar pagamento"}
             </button>
+
           </div>
 
         </form>

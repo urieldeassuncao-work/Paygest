@@ -1,79 +1,95 @@
-import { FileText, ChevronDown } from "lucide-react";
+
+import { Eye, Pencil, FileText } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 
-function PaymentsTable({payments}){
+function PaymentsTable({ payments, onView, onEdit }) {
 
-    const formatMoney = (amount) => {
-        return new Intl.NumberFormat("pt-AO").format(amount);
-    };
+  const formatMoney = (amount) => {
+    return new Intl.NumberFormat("pt-AO").format(amount);
+  };
 
-    return (
-        <div className="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Referência</th>
-                        <th>Pagador</th>
-                        <th>Beneficiário</th>
-                        <th>Valor</th>
-                        <th>Moeda</th>
-                        <th>Data do Pagamento</th>
-                        <th>Banco</th>
-                        <th>Canal</th>
-                        <th>Estado</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
+  return (
+    <div className="table-container">
 
-                <tbody>
+      <table>
 
-                    {payments.map((payment) => (
+        <thead>
+          <tr>
+            <th>Referência</th>
+            <th>Pagador</th>
+            <th>Beneficiário</th>
+            <th>Valor</th>
+            <th>Moeda</th>
+            <th>Data</th>
+            <th>Banco</th>
+            <th>Canal</th>
+            <th>Estado</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
 
-                        <tr key={payment.id}>
+        <tbody>
 
-                            <td>
-                                <div className="reference">
-                                <FileText size={17} />
-                                {payment.reference}
-                                </div>
-                            </td>
+          {payments.map((payment) => (
 
-                            <td>{payment.payer}</td>
+            <tr key={payment.id}>
 
-                            <td>{payment.beneficiary}</td>
+              <td>
+                <div className="reference">
+                  <FileText size={17} />
+                  {payment.reference}
+                </div>
+              </td>
 
-                            <td>
-                                {formatMoney(payment.amount)}
-                            </td>
+              <td>{payment.payer}</td>
+              <td>{payment.beneficiary}</td>
 
-                            <td>{payment.currency}</td>
+              <td>{formatMoney(payment.amount)}</td>
+              <td>{payment.currency}</td>
+              <td>{payment.date}</td>
+              <td>{payment.bank}</td>
+              <td>{payment.channel}</td>
 
-                            <td>{payment.date}</td>
+              <td>
+                <StatusBadge status={payment.status} />
+              </td>
 
-                            <td>{payment.bank}</td>
+              <td>
+                <div className="table-actions">
 
-                            <td>{payment.channel}</td>
+                  <button
+                    title="Ver detalhes"
+                    onClick={() => onView(payment)}
+                  >
+                    <Eye size={17} />
+                  </button>
 
-                            <td>
-                                <StatusBadge status={payment.status} />
-                            </td>
+                  <button
+                    title="Editar pagamento"
+                    onClick={() => onEdit(payment)}
+                  >
+                    <Pencil size={17} />
+                  </button>
 
-                            <td>
-                                <button className="action-button">
-                                Acções
-                                <ChevronDown size={10} />
-                                </button>
-                            </td>
+                </div>
+              </td>
 
-                        </tr>
+            </tr>
 
-                    ))}
+          ))}
 
-                </tbody>
-            </table>
-        </div>
-    );
+        </tbody>
 
+      </table>
+
+      {payments.length === 0 && (
+        <p className="empty-state">
+          Nenhum pagamento encontrado.
+        </p>
+      )}
+
+    </div>
+  );
 }
 
 export default PaymentsTable;
