@@ -8,6 +8,7 @@ import SearchFilters from "../components/SearchFilter";
 import PaymentsTable from "../components/PaymentsTable";
 import PaymentModal from "../components/PaymentsModal";
 import PaymentDetailsModal from "../components/paymentsDetailModal";
+import ExcellReader from "../components/excellReader";
 
 function Payments() {
 
@@ -117,6 +118,32 @@ function Payments() {
     setSelectedPayment(null);
   }
 
+  function handleExcelImport(excelData){
+
+    const importPayments = excelData.map((row) => ({
+      id:Date.now() + Math.random(),
+      reference: row.Referência,
+      payer: row.Pagador,
+      beneficiary: row.Beneficiário,
+      reference: row.Referência,
+
+      amount:number(row.Valor),
+
+
+      bank:row.Banco,
+      channel:row.Canal,
+      date:row.Data,
+
+      currency:row.Modeda || "AOA",
+      status:"Pendente"
+    }));
+
+    setCurrentPage(1);
+
+    alert(`${importPayments.length} Pagamentos importados com sucesso!`)
+
+  };
+
   return (
     <section className="payments-page">
 
@@ -137,6 +164,8 @@ function Payments() {
           <Plus size={19} />
           Novo Pagamento
         </button>
+
+        <ExcellReader onImport={handleExcelImport} />
 
       </div>
 
